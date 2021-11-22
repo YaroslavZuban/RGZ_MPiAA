@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/RGZ_MPiAA.iml" filepath="$PROJECT_DIR$/RGZ_MPiAA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mobileRobot/mobileRobot.iml" filepath="$PROJECT_DIR$/mobileRobot/mobileRobot.iml" />
+    </modules>
+  </component>
+</project>
