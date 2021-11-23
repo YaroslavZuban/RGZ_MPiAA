@@ -1,4 +1,5 @@
 package Graphics;
+
 import Graphs.Graph;
 
 import javax.swing.*;
@@ -10,16 +11,16 @@ import java.util.ArrayList;
 public class Main {
     private static boolean startPointMoving = false;
     private static boolean endPointMoving = false;
-    private static boolean rectanglePointMoving=false;
+    private static boolean rectanglePointMoving = false;
 
     private static Point pressMousePoint = new Point();
     private static Point circlePosition = new Point();
-    private static Point rectanglePosition=new Point();
+    private static Point rectanglePosition = new Point();
 
     public static final int splittingX = 15;
     public static final int splittingY = 15;
 
-    public static final int radius=15;
+    public static final int radius = 15;
 
     public static void main(String[] args) {
         System.out.println("Запуск игры...");
@@ -98,20 +99,14 @@ public class Main {
                 System.out.println(e.getX());
                 System.out.println(e.getY());
 
-                int x = e.getX();
-                int y = e.getY();
-
-                int centerX = LightweightRect.rectangle.x ;
-                int centerY = LightweightRect.rectangle.y ;
-
                 if (isEmpty(e.getPoint())) {
                     rectanglePointMoving = true;
 
                     pressMousePoint.x = e.getX();
                     pressMousePoint.y = e.getY();
 
-                    rectanglePosition.x = LightweightRect.endPoint.x;
-                    rectanglePosition.y = LightweightRect.endPoint.y;
+                    rectanglePosition.x = LightweightRect.rectangle.x;
+                    rectanglePosition.y = LightweightRect.rectangle.y;
                 } else {
                     rectanglePointMoving = false;
                 }
@@ -133,7 +128,7 @@ public class Main {
                     newCircleY = splittingY * pointAttractionY - radius;
 
                     if (newCircleX <= window.getWidth() && newCircleY <= window.getHeight() && newCircleX >= 0 && newCircleY >= 0) {
-                            LightweightRect.startPoint.setLocation(newCircleX, newCircleY);
+                        LightweightRect.startPoint.setLocation(newCircleX, newCircleY);
                     }
 
                     jComponent.repaint();
@@ -155,7 +150,7 @@ public class Main {
                     long pointAttractionY = Math.round(newCircleY / splittingY);
                     newCircleY = splittingY * pointAttractionY - radius;
 
-                    if (newCircleX <= window.getWidth() && newCircleY <= window.getHeight() && newCircleX >= 0 && newCircleY >= 0 ) {
+                    if (newCircleX <= window.getWidth() && newCircleY <= window.getHeight() && newCircleX >= 0 && newCircleY >= 0) {
                         LightweightRect.endPoint.setLocation(newCircleX, newCircleY);
                     }
 
@@ -174,12 +169,12 @@ public class Main {
                     double newRectangleY = e.getY() - pressMousePoint.y + rectanglePosition.y;
 
                     long pointAttractionX = Math.round(newRectangleX / splittingX);
-                    newRectangleX = splittingX * pointAttractionX ;
+                    newRectangleX = splittingX * pointAttractionX;
 
                     long pointAttractionY = Math.round(newRectangleY / splittingY);
                     newRectangleY = splittingY * pointAttractionY;
 
-                    if (newRectangleX <= window.getWidth() && newRectangleY <= window.getHeight() && newRectangleX >= 0 && newRectangleY >= 0 ) {
+                    if (newRectangleX <= window.getWidth() && newRectangleY <= window.getHeight() && newRectangleX >= 0 && newRectangleY >= 0) {
                         LightweightRect.rectangle.setLocation(newRectangleX, newRectangleY);
                     }
 
@@ -187,21 +182,22 @@ public class Main {
                 }
             }
         });
+
         window.setVisible(true);
         System.out.println("Конец игры...");
     }
 
-    private static boolean isEmpty(Point mouse){
-        if(rectanglePosition.getX()<=mouse.getX() && rectanglePosition.getY()<=mouse.getY()&&
+    private static boolean isEmpty(Point mouse) {
+        if (rectanglePosition.getX() <= mouse.getX() && rectanglePosition.getY() <= mouse.getY() &&
 
-                (rectanglePosition.getX()+LightweightRect.width)>=mouse.getX()&&
-                rectanglePosition.getY()<=mouse.getY()&&
+                (rectanglePosition.getX() + LightweightRect.width) >= mouse.getX() &&
+                rectanglePosition.getY() <= mouse.getY() &&
 
-                rectanglePosition.getX()<=mouse.getX()&&
-                (rectanglePosition.getY()+LightweightRect.height)>=mouse.getY()&&
+                rectanglePosition.getX() <= mouse.getX() &&
+                (rectanglePosition.getY() + LightweightRect.height) >= mouse.getY() &&
 
-                (rectanglePosition.getX()+LightweightRect.width)>=mouse.getX()&&
-                (rectanglePosition.getY()+LightweightRect.height)>=mouse.getY()
+                (rectanglePosition.getX() + LightweightRect.width) >= mouse.getX() &&
+                (rectanglePosition.getY() + LightweightRect.height) >= mouse.getY()
         )
             return true;
 
@@ -214,17 +210,17 @@ public class Main {
         public static Point startPoint = new Point(30 - radius, 30 - radius);
         public static Point mouseStart;
 
-        public static Point endPoint = new Point(270- radius, 270 - radius);
+        public static Point endPoint = new Point(270 - radius, 270 - radius);
         public static Point mouseEnd;
 
 
-        public static Point rectangle=new Point(360,360);
+        public static Point rectangle = new Point(360, 360);
         public static Point mouseRectangle;
-        public static int width=100;
-        public static int height=250;
+        public static int width = 100;
+        public static int height = 250;
 
 
-        private static boolean isWork=true;
+        private static boolean isWork = true;
 
         @Override
         public void paintComponent(Graphics graphics) {
@@ -239,23 +235,22 @@ public class Main {
 
 
             graphics.setColor(Color.ORANGE);
-            graphics.fillRect((int) rectangle.getX(),(int)rectangle.getY(),width,height);
+            graphics.fillRect((int) rectangle.getX(), (int) rectangle.getY(), width, height);
 
-            ArrayList< Graphs.Point>list=Graph.FindPath(new Graphs.Point(
-                    (int)startPoint.getX()/splittingX
-                            ,(int)startPoint.getY()/splittingY),
-                    new Graphs.Point((int)endPoint.getX()/splittingX,
-                            (int)endPoint.getY()/splittingY));
-
+            ArrayList<Graphs.Point> list = Graph.FindPath(new Graphs.Point(
+                            (int) startPoint.getX() / splittingX
+                            , (int) startPoint.getY() / splittingY),
+                    new Graphs.Point((int) endPoint.getX() / splittingX,
+                            (int) endPoint.getY() / splittingY));
 
 
             graphics.setColor(Color.RED);
-            Graphics2D g=(Graphics2D)graphics;
+            Graphics2D g = (Graphics2D) graphics;
             g.setStroke(new BasicStroke(3));
 
-            for(int i=0;i<list.size()-1;i++){
-                graphics.drawLine(list.get(i).X*splittingX+radius,list.get(i).Y*splittingY+radius
-                        ,list.get(i+1).X*splittingX+radius,list.get(i+1).Y*splittingY+radius);
+            for (int i = 0; i < list.size() - 1; i++) {
+                graphics.drawLine(list.get(i).X * splittingX + radius, list.get(i).Y * splittingY + radius
+                        , list.get(i + 1).X * splittingX + radius, list.get(i + 1).Y * splittingY + radius);
             }
 
             System.out.println(list);
@@ -270,7 +265,7 @@ public class Main {
 
             g.setColor(Color.BLACK);
 
-            for (int i = 1; i <= getWidth()/splittingX; i++) {
+            for (int i = 1; i <= getWidth() / splittingX; i++) {
                 int y1 = dh * i;
                 int x1 = dw * i;
 
@@ -286,15 +281,15 @@ public class Main {
             }
 
 
-            if(isWork) {
-                Graph.matrix=new int[getWidth()/splittingX][getHeight()/splittingY];
+            if (isWork) {
+                Graph.matrix = new int[getWidth() / splittingX][getHeight() / splittingY];
 
-                for (int i = 0; i < getWidth()/splittingX; i++) {
-                    for (int j = 0; j < getHeight()/splittingY; j++) {
-                        Graph.matrix[i][j]=splittingY;
+                for (int i = 0; i < getWidth() / splittingX; i++) {
+                    for (int j = 0; j < getHeight() / splittingY; j++) {
+                        Graph.matrix[i][j] = splittingY;
                     }
                 }
-                isWork=false;
+                isWork = false;
             }
         }
     }
