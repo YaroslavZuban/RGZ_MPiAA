@@ -120,5 +120,21 @@ public class Graph {
         }
         return result;
     }
+
+    private static boolean isEmpty(Point p){
+        Point temp1 = new Point(p.getX() - 1, p.getY()-1);
+        Point temp2 = new Point(p.getX() + 1, p.getY()-1);
+        Point temp3  = new Point(p.getX()-1, p.getY() + 1);
+        Point temp4 = new Point(p.getX()+1, p.getY() + 1);
+
+        if (matrix[temp1.X][temp1.Y]==Integer.MAX_VALUE ||
+                matrix[temp2.X][temp2.Y]==Integer.MAX_VALUE ||
+                matrix[temp3.X][temp3.Y]==Integer.MAX_VALUE ||
+                matrix[temp4.X][temp4.Y]==Integer.MAX_VALUE
+        )
+            return true;
+
+        return false;
+    }
 }
 

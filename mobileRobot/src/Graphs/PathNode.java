@@ -11,8 +11,10 @@ public class PathNode extends Point{
         position = point;
         setCameFrome(pathNode);
         this.goal = goal;
+
         if (pathNode!=null)//нужно только для стартовой точки
             setLengthFromStart(pathNode.getLengthFromStart());
+
         else setLengthFromStart(-1);
         setLengthToGoal(goal);
         setFullLength(getLengthFromStart()+getLengthToGoal());

@@ -14,6 +14,8 @@ public class Main {
     private static boolean rectanglePointMoving = false;
 
     private static Point pressMousePoint = new Point();
+    private static Point pressMouseRectangle=new Point();
+
     private static Point circlePosition = new Point();
     private static Point rectanglePosition = new Point();
 
@@ -67,8 +69,6 @@ public class Main {
                 super.mousePressed(e);
                 LightweightRect.mouseEnd = e.getPoint();
 
-                System.out.println(e.getX());
-                System.out.println(e.getY());
 
                 int x = e.getX();
                 int y = e.getY();
@@ -102,8 +102,8 @@ public class Main {
                 if (isEmpty(e.getPoint())) {
                     rectanglePointMoving = true;
 
-                    pressMousePoint.x = e.getX();
-                    pressMousePoint.y = e.getY();
+                    pressMouseRectangle.x = e.getX();
+                    pressMouseRectangle.y = e.getY();
 
                     rectanglePosition.x = LightweightRect.rectangle.x;
                     rectanglePosition.y = LightweightRect.rectangle.y;
@@ -165,8 +165,8 @@ public class Main {
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
                 if (rectanglePointMoving) {
-                    double newRectangleX = e.getX() - pressMousePoint.x + rectanglePosition.x;
-                    double newRectangleY = e.getY() - pressMousePoint.y + rectanglePosition.y;
+                    double newRectangleX = e.getX() - pressMouseRectangle.x + rectanglePosition.x;
+                    double newRectangleY = e.getY() - pressMouseRectangle.y + rectanglePosition.y;
 
                     long pointAttractionX = Math.round(newRectangleX / splittingX);
                     newRectangleX = splittingX * pointAttractionX;
@@ -188,16 +188,16 @@ public class Main {
     }
 
     private static boolean isEmpty(Point mouse) {
-        if (rectanglePosition.getX() <= mouse.getX() && rectanglePosition.getY() <= mouse.getY() &&
+        if (LightweightRect.rectangle.getX() <= mouse.getX() && LightweightRect.rectangle.getY() <= mouse.getY() &&
 
-                (rectanglePosition.getX() + LightweightRect.width) >= mouse.getX() &&
-                rectanglePosition.getY() <= mouse.getY() &&
+                (LightweightRect.rectangle.getX() + LightweightRect.width) >= mouse.getX() &&
+                LightweightRect.rectangle.getY() <= mouse.getY() &&
 
-                rectanglePosition.getX() <= mouse.getX() &&
-                (rectanglePosition.getY() + LightweightRect.height) >= mouse.getY() &&
+                LightweightRect.rectangle.getX() <= mouse.getX() &&
+                (LightweightRect.rectangle.getY() + LightweightRect.height) >= mouse.getY() &&
 
-                (rectanglePosition.getX() + LightweightRect.width) >= mouse.getX() &&
-                (rectanglePosition.getY() + LightweightRect.height) >= mouse.getY()
+                (LightweightRect.rectangle.getX() + LightweightRect.width) >= mouse.getX() &&
+                (LightweightRect.rectangle.getY() + LightweightRect.height) >= mouse.getY()
         )
             return true;
 
@@ -216,8 +216,8 @@ public class Main {
 
         public static Point rectangle = new Point(360, 360);
         public static Point mouseRectangle;
-        public static int width = 100;
-        public static int height = 250;
+        public static int width = 7*splittingX;
+        public static int height = 16*splittingY;
 
 
         private static boolean isWork = true;
@@ -253,7 +253,7 @@ public class Main {
                         , list.get(i + 1).X * splittingX + radius, list.get(i + 1).Y * splittingY + radius);
             }
 
-            System.out.println(list);
+           //System.out.println(list);
         }
 
         private void drawGrid(Graphics g) {
@@ -281,7 +281,7 @@ public class Main {
             }
 
 
-            if (isWork) {
+
                 Graph.matrix = new int[getWidth() / splittingX][getHeight() / splittingY];
 
                 for (int i = 0; i < getWidth() / splittingX; i++) {
@@ -289,8 +289,13 @@ public class Main {
                         Graph.matrix[i][j] = splittingY;
                     }
                 }
-                isWork = false;
-            }
+
+                for(int i = (int) rectangle.getX()-splittingX; i<rectangle.getX()+width;i+=splittingX){
+                    for(int j=(int)rectangle.getY()-splittingY;j<rectangle.getY()+height;j+=splittingY){
+                        Graph.matrix[i/splittingX][j/splittingY]=Integer.MAX_VALUE;
+                    }
+                }
+
         }
     }
 }
