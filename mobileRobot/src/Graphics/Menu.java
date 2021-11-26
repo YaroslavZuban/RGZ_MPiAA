@@ -31,7 +31,8 @@ public class Menu {
         saveCoordinates.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-
+                Rules rules=new Rules();
+                windowPatch.setVisible(false);
             }
         });
 
