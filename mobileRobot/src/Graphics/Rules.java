@@ -23,8 +23,7 @@ public class Rules extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
-
-
+        
         back.setBounds(650,700,100,40);
         back.addMouseListener(new MouseAdapter() {
             @Override

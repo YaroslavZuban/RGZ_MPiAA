@@ -21,7 +21,7 @@ public class Menu {
         play.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                SettingGame settingGame=new SettingGame();
+                SettingGame settingGame = new SettingGame();
                 windowPatch.setVisible(false);
                 settingGame.setVisible(true);
             }
@@ -31,7 +31,7 @@ public class Menu {
         saveCoordinates.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                Rules rules=new Rules();
+                Rules rules = new Rules();
                 windowPatch.setVisible(false);
             }
         });

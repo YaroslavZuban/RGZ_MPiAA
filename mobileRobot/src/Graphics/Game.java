@@ -8,27 +8,36 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class Main {
-    private static boolean startPointMoving = false;
-    private static boolean endPointMoving = false;
 
-    private static boolean rectanglePointMoving = false;
-    private static boolean rectanglePointMoving2 = false;
+public class Game {
+    private int countIntermediate;
+    private int countRectangles;
+    private boolean startPointMoving = false;
+    private boolean endPointMoving = false;
 
-    private static Point pressMousePoint = new Point();
-    private static Point pressMouseRectangle = new Point();
-    private static Point pressMouseRectangle2 = new Point();
+    private JButton wau=new JButton("Путь");
+    private JButton exit=new JButton("Назад");
 
-    private static Point circlePosition = new Point();
-    private static Point rectanglePosition = new Point();
-    private static Point rectanglePosition2 = new Point();
+    private boolean rectanglePointMoving = false;
+    private boolean rectanglePointMoving2 = false;
 
-    public static final int splittingX = 15;
-    public static final int splittingY = 15;
+    private Point pressMousePoint = new Point();
+    private Point pressMouseRectangle = new Point();
+    private Point pressMouseRectangle2 = new Point();
+
+    private Point circlePosition = new Point();
+    private Point rectanglePosition = new Point();
+    private Point rectanglePosition2 = new Point();
+
+    public final int splittingX = 15;
+    public final int splittingY = 15;
 
     public static final int radius = 15;
 
-    public static void windowPlay() {
+    public Game(int countIntermediate, int countRectangles) {
+        this.countIntermediate = countIntermediate;
+        this.countRectangles = countRectangles;
+
         System.out.println("Запуск игры...");
         JFrame window = new JFrame("Мобильный робот движется по плоскости");
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -36,6 +45,19 @@ public class Main {
 
         window.setLocationRelativeTo(null);
         window.setResizable(false);
+
+      /*  wau.setBounds(800,20,80,40);
+        wau.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+
+            }
+        });
+        window.add(wau);
+
+        exit.setBounds(800,80,80,40);
+        window.add(exit);*/
 
         JComponent jComponent = new LightweightRect();
 
@@ -237,7 +259,7 @@ public class Main {
         System.out.println("Конец игры...");
     }
 
-    private static boolean isEmpty(Point point, Point mouse, int width, int height) {
+    private boolean isEmpty(Point point, Point mouse, int width, int height) {
         if (point.getX() <= mouse.getX() && point.getY() <= mouse.getY() &&
 
                 (point.getX() + width) >= mouse.getX() &&
@@ -255,7 +277,7 @@ public class Main {
     }
 
 
-    static class LightweightRect extends JComponent {
+    class LightweightRect extends JComponent {
 
         public static Point startPoint = new Point(30 - radius, 30 - radius);
         public static Point mouseStart;
@@ -349,8 +371,7 @@ public class Main {
 
         }
 
-
-        private static void infiniteSpace(Point p, int width, int height) {
+        private void infiniteSpace(Point p, int width, int height) {
             for (int i = (int) p.getX() - splittingX; i < p.getX() + width; i += splittingX) {
                 for (int j = (int) p.getY() - splittingY; j < p.getY() + height; j += splittingY) {
                     Graph.matrix[i / splittingX][j / splittingY] = Integer.MAX_VALUE;
@@ -359,6 +380,8 @@ public class Main {
         }
     }
 }
+
+
 
 
 

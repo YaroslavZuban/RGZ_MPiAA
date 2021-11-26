@@ -9,8 +9,8 @@ import java.awt.event.MouseEvent;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 public class SettingGame extends JFrame {
-    private Integer countIntermediate=0;
-    private Integer countRectangles=0;
+    private Integer countIntermediate = 0;
+    private Integer countRectangles = 0;
 
     private static JLabel intermediatePoints = new JLabel("Введите число промежуточных точек");
     private static JTextField countIntermediatePoints = new JTextField("0", 10);
@@ -19,7 +19,7 @@ public class SettingGame extends JFrame {
     private static JTextField countObstacles = new JTextField("0", 10);
 
     private static JButton save = new JButton("Сохранить");
-    private static JButton exit=new JButton("Назад");
+    private static JButton exit = new JButton("Назад");
 
     public SettingGame() {
         super("Настройка игры");
@@ -42,19 +42,19 @@ public class SettingGame extends JFrame {
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
                 try {
-                    countIntermediate=Integer.parseInt(countIntermediatePoints.getText());
-                    if(countIntermediate>=5 ||countIntermediate<0){
+                    countIntermediate = Integer.parseInt(countIntermediatePoints.getText());
+                    if (countIntermediate >= 5 || countIntermediate < 0) {
                         throw new Exception();
                     }
 
-                    countRectangles=Integer.parseInt(countObstacles.getText());
+                    countRectangles = Integer.parseInt(countObstacles.getText());
 
-                    if(countRectangles>=5 ||countRectangles<0){
+                    if (countRectangles >= 5 || countRectangles < 0) {
                         throw new Exception();
                     }
 
-
-                }catch (Exception exception){
+                    Game game = new Game(countIntermediate, countRectangles);
+                } catch (Exception exception) {
                     errorConsole();
                 }
 
