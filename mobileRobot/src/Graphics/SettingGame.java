@@ -43,13 +43,13 @@ public class SettingGame extends JFrame {
                 super.mousePressed(e);
                 try {
                     countIntermediate = Integer.parseInt(countIntermediatePoints.getText());
-                    if (countIntermediate >= 5 || countIntermediate < 0) {
+                    if (countIntermediate >= 4 || countIntermediate < 0) {
                         throw new Exception();
                     }
 
                     countRectangles = Integer.parseInt(countObstacles.getText());
 
-                    if (countRectangles >= 5 || countRectangles < 0) {
+                    if (countRectangles >= 4 || countRectangles < 0) {
                         throw new Exception();
                     }
 
@@ -57,7 +57,7 @@ public class SettingGame extends JFrame {
                 } catch (Exception exception) {
                     errorConsole();
                 }
-
+                setVisible(false);
             }
         });
         container.add(save);

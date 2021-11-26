@@ -10,24 +10,15 @@ import java.util.ArrayList;
 
 
 public class Game {
-    private int countIntermediate;
-    private int countRectangles;
-    private boolean startPointMoving = false;
-    private boolean endPointMoving = false;
-
-    private JButton wau=new JButton("Путь");
-    private JButton exit=new JButton("Назад");
-
-    private boolean rectanglePointMoving = false;
-    private boolean rectanglePointMoving2 = false;
+    private ArrayList<Boolean> pointsMoving = new ArrayList<>();
 
     private Point pressMousePoint = new Point();
-    private Point pressMouseRectangle = new Point();
-    private Point pressMouseRectangle2 = new Point();
-
     private Point circlePosition = new Point();
-    private Point rectanglePosition = new Point();
-    private Point rectanglePosition2 = new Point();
+
+    private ArrayList<Point> pressMouseR = new ArrayList<>();
+    private ArrayList<Boolean> movingRectangle = new ArrayList<>();
+
+    private ArrayList<Point> positionR = new ArrayList<>();
 
     public final int splittingX = 15;
     public final int splittingY = 15;
@@ -35,9 +26,37 @@ public class Game {
     public static final int radius = 15;
 
     public Game(int countIntermediate, int countRectangles) {
-        this.countIntermediate = countIntermediate;
-        this.countRectangles = countRectangles;
+        //Работа с окружностями
+        LightweightRect.points.add(LightweightRect.startPoint);
 
+        int d=60;
+        for (int i = 0; i < countIntermediate; i++) {
+            LightweightRect.points.add(new Point(d - radius, 30 - radius));
+            d+=d;
+        }
+
+        LightweightRect.points.add(LightweightRect.endPoint);
+
+        for (int i = 0; i < LightweightRect.points.size(); i++) {
+            pointsMoving.add(false);
+            LightweightRect.mouse.add(new Point());
+        }
+
+        int w = radius;
+        int h = radius;
+        //Работа с прямоугольниками
+        for (int i = 0; i < countRectangles; i++) {
+            if (i % 2 != 0) {
+                LightweightRect.rectangle.add(new Point(w, 90));
+                w += LightweightRect.width + 15;
+            } else {
+                LightweightRect.rectangle.add(new Point(h, 400));
+                h += LightweightRect.height + 15;
+            }
+
+            movingRectangle.add(false);
+            pressMouseR.add(new Point());
+        }
         System.out.println("Запуск игры...");
         JFrame window = new JFrame("Мобильный робот движется по плоскости");
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -46,221 +65,135 @@ public class Game {
         window.setLocationRelativeTo(null);
         window.setResizable(false);
 
-      /*  wau.setBounds(800,20,80,40);
-        wau.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
-
-            }
-        });
-        window.add(wau);
-
-        exit.setBounds(800,80,80,40);
-        window.add(exit);*/
-
         JComponent jComponent = new LightweightRect();
 
         window.add(jComponent);
 
-        jComponent.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
-                LightweightRect.mouseStart = e.getPoint();
+        for (int i = 0; i < LightweightRect.points.size(); i++) {
+            int finalI = i;
 
-                int x = e.getX();
-                int y = e.getY();
+            jComponent.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    super.mousePressed(e);
+                    LightweightRect.mouse.set(finalI, e.getPoint());
 
-                int centerX = LightweightRect.startPoint.x + radius;
-                int centerY = LightweightRect.startPoint.y + radius;
+                    int x = e.getX();
+                    int y = e.getY();
 
-                if (Math.pow((x - centerX), 2) + Math.pow((y - centerY), 2) < Math.pow(radius, 2)) {
-                    startPointMoving = true;
+                    int centerX = LightweightRect.points.get(finalI).x + radius;
+                    int centerY = LightweightRect.points.get(finalI).y + radius;
 
-                    pressMousePoint.x = e.getX();
-                    pressMousePoint.y = e.getY();
+                    if (Math.pow((x - centerX), 2) + Math.pow((y - centerY), 2) < Math.pow(radius, 2)) {
+                        pointsMoving.set(finalI, true);
 
-                    circlePosition.x = LightweightRect.startPoint.x;
-                    circlePosition.y = LightweightRect.startPoint.y;
-                } else {
-                    startPointMoving = false;
-                }
-            }
-        });
+                        pressMousePoint.x = e.getX();//не трогать
+                        pressMousePoint.y = e.getY();//не трогать
 
-        jComponent.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
-                LightweightRect.mouseEnd = e.getPoint();
-
-
-                int x = e.getX();
-                int y = e.getY();
-
-                int centerX = LightweightRect.endPoint.x + radius;
-                int centerY = LightweightRect.endPoint.y + radius;
-
-                if (Math.pow((x - centerX), 2) + Math.pow((y - centerY), 2) < Math.pow(radius, 2)) {
-                    endPointMoving = true;
-
-                    pressMousePoint.x = e.getX();
-                    pressMousePoint.y = e.getY();
-
-                    circlePosition.x = LightweightRect.endPoint.x;
-                    circlePosition.y = LightweightRect.endPoint.y;
-                } else {
-                    endPointMoving = false;
-                }
-            }
-        });
-
-        jComponent.addMouseListener(new MouseAdapter() {//прямоугольник
-            @Override
-            public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
-                LightweightRect.mouseRectangle = e.getPoint();
-
-                System.out.println(e.getX());
-                System.out.println(e.getY());
-
-                if (isEmpty(LightweightRect.rectangle, e.getPoint(), LightweightRect.width, LightweightRect.height)) {
-                    rectanglePointMoving = true;
-
-                    pressMouseRectangle.x = e.getX();
-                    pressMouseRectangle.y = e.getY();
-
-                    rectanglePosition.x = LightweightRect.rectangle.x;
-                    rectanglePosition.y = LightweightRect.rectangle.y;
-                } else {
-                    rectanglePointMoving = false;
-                }
-            }
-        });
-
-        jComponent.addMouseListener(new MouseAdapter() {//прямоугольник 2
-            @Override
-            public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
-                LightweightRect.mouseRectangle2 = e.getPoint();
-
-                System.out.println(e.getX());
-                System.out.println(e.getY());
-
-                if (isEmpty(LightweightRect.rectangle2, e.getPoint(), LightweightRect.height, LightweightRect.width)) {
-                    rectanglePointMoving2 = true;
-
-                    pressMouseRectangle2.x = e.getX();
-                    pressMouseRectangle2.y = e.getY();
-
-                    rectanglePosition2.x = LightweightRect.rectangle2.x;
-                    rectanglePosition2.y = LightweightRect.rectangle2.y;
-                } else {
-                    rectanglePointMoving2 = false;
-                }
-            }
-        });
-
-        jComponent.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                super.mouseDragged(e);
-                if (startPointMoving) {
-                    double newCircleX = e.getX() - pressMousePoint.x + circlePosition.x;
-                    double newCircleY = e.getY() - pressMousePoint.y + circlePosition.y;
-
-                    long pointAttractionX = Math.round(newCircleX / splittingX);
-                    newCircleX = splittingX * pointAttractionX - radius;
-
-                    long pointAttractionY = Math.round(newCircleY / splittingY);
-                    newCircleY = splittingY * pointAttractionY - radius;
-
-                    if (newCircleX <= window.getWidth() && newCircleY <= window.getHeight() && newCircleX >= 0 && newCircleY >= 0) {
-                        LightweightRect.startPoint.setLocation(newCircleX, newCircleY);
+                        circlePosition.x = LightweightRect.points.get(finalI).x;//не трогать
+                        circlePosition.y = LightweightRect.points.get(finalI).y;//не трогать
+                    } else {
+                        pointsMoving.set(finalI, false);
                     }
-
-                    jComponent.repaint();
                 }
-            }
-        });
+            });
+        }
 
-        jComponent.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                super.mouseDragged(e);
-                if (endPointMoving) {
-                    double newCircleX = e.getX() - pressMousePoint.x + circlePosition.x;
-                    double newCircleY = e.getY() - pressMousePoint.y + circlePosition.y;
 
-                    long pointAttractionX = Math.round(newCircleX / splittingX);
-                    newCircleX = splittingX * pointAttractionX - radius;
+        for (int i = 0; i < LightweightRect.rectangle.size(); i++) {
+            int finalI = i;
+            jComponent.addMouseListener(new MouseAdapter() {//прямоугольник
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    super.mousePressed(e);
 
-                    long pointAttractionY = Math.round(newCircleY / splittingY);
-                    newCircleY = splittingY * pointAttractionY - radius;
+                    if (finalI % 2 == 0) {
+                        if (isEmpty(LightweightRect.rectangle.get(finalI), e.getPoint(), LightweightRect.width, LightweightRect.height)) {
+                            movingRectangle.set(finalI, true);
 
-                    if (newCircleX <= window.getWidth() && newCircleY <= window.getHeight() && newCircleX >= 0 && newCircleY >= 0) {
-                        LightweightRect.endPoint.setLocation(newCircleX, newCircleY);
+                            pressMouseR.set(finalI, e.getPoint());
+
+                            positionR.set(finalI, LightweightRect.rectangle.get(finalI));
+                        } else {
+                            movingRectangle.set(finalI, false);
+                        }
+                    } else {
+                        if (isEmpty(LightweightRect.rectangle.get(finalI), e.getPoint(), LightweightRect.height, LightweightRect.width)) {
+                            movingRectangle.set(finalI, true);
+
+                            pressMouseR.set(finalI, e.getPoint());
+
+                            positionR.set(finalI, LightweightRect.rectangle.get(finalI));
+                        } else {
+                            movingRectangle.set(finalI, false);
+                        }
                     }
-
-                    jComponent.repaint();
                 }
-            }
-        });
+            });
+        }
 
+        for (int i = 0; i < LightweightRect.points.size(); i++) {
+            int finalI = i;
 
-        jComponent.addMouseMotionListener(new MouseAdapter() {//прямоугольник1
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                super.mouseDragged(e);
-                if (rectanglePointMoving) {
-                    double newRectangleX = e.getX() - pressMouseRectangle.x + rectanglePosition.x;
-                    double newRectangleY = e.getY() - pressMouseRectangle.y + rectanglePosition.y;
+            jComponent.addMouseMotionListener(new MouseAdapter() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    super.mouseDragged(e);
+                    if (pointsMoving.get(finalI)) {
+                        double newCircleX = e.getX() - pressMousePoint.x + circlePosition.x;
+                        double newCircleY = e.getY() - pressMousePoint.y + circlePosition.y;
 
-                    long pointAttractionX = Math.round(newRectangleX / splittingX);
-                    newRectangleX = splittingX * pointAttractionX;
+                        long pointAttractionX = Math.round(newCircleX / splittingX);
+                        newCircleX = splittingX * pointAttractionX - radius;
 
-                    long pointAttractionY = Math.round(newRectangleY / splittingY);
-                    newRectangleY = splittingY * pointAttractionY;
+                        long pointAttractionY = Math.round(newCircleY / splittingY);
+                        newCircleY = splittingY * pointAttractionY - radius;
 
-                    if (newRectangleX <= window.getWidth() && newRectangleY <= window.getHeight() && newRectangleX >= 0 && newRectangleY >= 0) {
-                        LightweightRect.rectangle.setLocation(newRectangleX, newRectangleY);
+                        if (newCircleX <= window.getWidth() && newCircleY <= window.getHeight() && newCircleX >= 0 && newCircleY >= 0) {
+                            LightweightRect.points.get(finalI).setLocation(newCircleX, newCircleY);
+                        }
+
+                        jComponent.repaint();
                     }
-
-                    jComponent.repaint();
                 }
-            }
-        });
+            });
+        }
 
-        jComponent.addMouseMotionListener(new MouseAdapter() {//прямоугольник2
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                super.mouseDragged(e);
-                if (rectanglePointMoving2) {
-                    double newRectangleX = e.getX() - pressMouseRectangle2.x + rectanglePosition2.x;
-                    double newRectangleY = e.getY() - pressMouseRectangle2.y + rectanglePosition2.y;
+        for (int i = 0; i < LightweightRect.points.size(); i++) {
+            int finalI = i;
+            jComponent.addMouseMotionListener(new MouseAdapter() {//прямоугольник
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    super.mouseDragged(e);
+                    if (movingRectangle.get(finalI)) {
+                        double newRectangleX = e.getX() - pressMouseR.get(finalI).x + positionR.get(finalI).x;
+                        double newRectangleY = e.getY() - pressMouseR.get(finalI).y + positionR.get(finalI).y;
 
-                    long pointAttractionX = Math.round(newRectangleX / splittingX);
-                    newRectangleX = splittingX * pointAttractionX;
+                        long pointAttractionX = Math.round(newRectangleX / splittingX);
+                        newRectangleX = splittingX * pointAttractionX;
 
-                    long pointAttractionY = Math.round(newRectangleY / splittingY);
-                    newRectangleY = splittingY * pointAttractionY;
+                        long pointAttractionY = Math.round(newRectangleY / splittingY);
+                        newRectangleY = splittingY * pointAttractionY;
 
-                    if (newRectangleX <= window.getWidth() && newRectangleY <= window.getHeight() && newRectangleX >= 0 && newRectangleY >= 0) {
-                        LightweightRect.rectangle2.setLocation(newRectangleX, newRectangleY);
+                        if (newRectangleX <= window.getWidth() && newRectangleY <= window.getHeight() && newRectangleX >= 0 && newRectangleY >= 0) {
+                            Point temp = new Point();
+                            temp.setLocation(newRectangleX, newRectangleY);
+
+                            LightweightRect.rectangle.set(finalI, temp);
+                        }
+
+                        jComponent.repaint();
                     }
-
-                    jComponent.repaint();
                 }
-            }
-        });
+            });
+        }
 
         window.setVisible(true);
         System.out.println("Конец игры...");
     }
 
     private boolean isEmpty(Point point, Point mouse, int width, int height) {
-        if (point.getX() <= mouse.getX() && point.getY() <= mouse.getY() &&
+        return point.getX() <= mouse.getX() && point.getY() <= mouse.getY() &&
 
                 (point.getX() + width) >= mouse.getX() &&
                 point.getY() <= mouse.getY() &&
@@ -269,34 +202,24 @@ public class Game {
                 (point.getY() + height) >= mouse.getY() &&
 
                 (point.getX() + width) >= mouse.getX() &&
-                (point.getY() + height) >= mouse.getY()
-        )
-            return true;
-
-        return false;
+                (point.getY() + height) >= mouse.getY();
     }
 
 
     class LightweightRect extends JComponent {
+        //Окружности
+        public static ArrayList<Point> points = new ArrayList<>();
+        public static ArrayList<Point> mouse = new ArrayList<>();
 
         public static Point startPoint = new Point(30 - radius, 30 - radius);
-        public static Point mouseStart;
 
         public static Point endPoint = new Point(270 - radius, 270 - radius);
-        public static Point mouseEnd;
 
-
-        public static Point rectangle = new Point(360, 360);
-        public static Point mouseRectangle;
-
-        public static Point rectangle2 = new Point(600, 600);
-        public static Point mouseRectangle2;
+        //прямоугольники
+        public static ArrayList<Point> rectangle = new ArrayList<>();
 
         public static int width = 100;
         public static int height = 200;
-
-
-        private static boolean isWork = true;
 
         @Override
         public void paintComponent(Graphics graphics) {
@@ -305,31 +228,38 @@ public class Game {
 
             graphics.setColor(Color.RED);
             graphics.fillOval(startPoint.x, startPoint.y, 30, 30);
-
-            graphics.setColor(Color.BLUE);
             graphics.fillOval(endPoint.x, endPoint.y, 30, 30);
 
+            graphics.setColor(Color.BLUE);
+            for (int i = 1; i < points.size() - 1; i++) {
+                graphics.fillOval(points.get(i).x, points.get(i).y, 30, 30);
+            }
 
             graphics.setColor(Color.ORANGE);
-            graphics.fillRect((int) rectangle.getX(), (int) rectangle.getY(), width, height);
-
-            graphics.setColor(Color.ORANGE);
-            graphics.fillRect((int) rectangle2.getX(), (int) rectangle2.getY(), height, width);
-
-            ArrayList<Graphs.Point> list = Graph.FindPath(new Graphs.Point(
-                            (int) startPoint.getX() / splittingX
-                            , (int) startPoint.getY() / splittingY),
-                    new Graphs.Point((int) endPoint.getX() / splittingX,
-                            (int) endPoint.getY() / splittingY));
-
+            for (int i = 0; i < rectangle.size(); i++) {
+                if (i % 2 == 0) {
+                    graphics.fillRect((int) rectangle.get(i).getX(), (int) rectangle.get(i).getY(), width, height);
+                } else {
+                    graphics.fillRect((int) rectangle.get(i).getX(), (int) rectangle.get(i).getY(), height, width);
+                }
+            }
 
             graphics.setColor(Color.RED);
-            Graphics2D g = (Graphics2D) graphics;
-            g.setStroke(new BasicStroke(3));
+            for(int j=0;j<points.size()-1;j++) {
+                ArrayList<Graphs.Point> list = Graph.FindPath(new Graphs.Point(
+                                (int) points.get(j).getX() / splittingX
+                                , (int) points.get(j).getY() / splittingY),
+                        new Graphs.Point((int) points.get(j+1).getX() / splittingX,
+                                (int) points.get(j+1).getY() / splittingY));
 
-            for (int i = 0; i < list.size() - 1; i++) {
-                graphics.drawLine(list.get(i).X * splittingX + radius, list.get(i).Y * splittingY + radius
-                        , list.get(i + 1).X * splittingX + radius, list.get(i + 1).Y * splittingY + radius);
+
+                Graphics2D g = (Graphics2D) graphics;
+                g.setStroke(new BasicStroke(3));
+
+                for (int i = 0; i < list.size() - 1; i++) {
+                    graphics.drawLine(list.get(i).X * splittingX + radius, list.get(i).Y * splittingY + radius
+                            , list.get(i + 1).X * splittingX + radius, list.get(i + 1).Y * splittingY + radius);
+                }
             }
         }
 
@@ -366,14 +296,18 @@ public class Game {
                 }
             }
 
-            infiniteSpace(rectangle, width, height);
-            infiniteSpace(rectangle2, height, width);
-
+            for (int i=0;i<rectangle.size();i++){
+                if(i%2==0){
+                    infiniteSpace(rectangle.get(i), width, height);
+                }else{
+                    infiniteSpace(rectangle.get(i), height,width);
+                }
+            }
         }
 
         private void infiniteSpace(Point p, int width, int height) {
-            for (int i = (int) p.getX() - splittingX; i < p.getX() + width; i += splittingX) {
-                for (int j = (int) p.getY() - splittingY; j < p.getY() + height; j += splittingY) {
+            for (int i = (int) p.getX()-splittingX ; i < p.getX() + width; i += splittingX) {
+                for (int j = (int) p.getY()-splittingY ; j < p.getY() + height; j += splittingY) {
                     Graph.matrix[i / splittingX][j / splittingY] = Integer.MAX_VALUE;
                 }
             }
