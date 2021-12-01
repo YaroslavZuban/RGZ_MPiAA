@@ -1,6 +1,7 @@
 package Graphics;
 
 import Graphs.Circle;
+import Graphs.Graph;
 import Graphs.LightweightRect;
 
 import javax.swing.*;
@@ -10,41 +11,66 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 
-public class Game {
+public class Game extends JFrame{
     private ArrayList<Circle> circles=new ArrayList<>();
     private ArrayList<Graphs.Rectangle> rectangles=new ArrayList<>();
 
     private Point pressMousePoint = new Point();
     private Point oldDraggedPositionPoint = new Point();
 
-    public  final static int splittingX = 15;
-    public  final static int splittingY = 15;
+    public  static int splittingX = 15;
+    public  static int splittingY = 15;
 
-    public static final int radius = 15;
+    public final static int fieldSize=900;
+
+    public static int radius = 15;
     public static int width = radius*6;
     public static int height = radius*13;
+    public static int  countIntermediate=2;
+    public static int  countRectangles=2;
+    private int x;
+    private int y;
 
+    private JButton addCircle=new JButton("Добавить точку");
+    private JButton removeCircle=new JButton("Удалить точку");
+    private JLabel countCircle=new JLabel("Промежуточные точки: "+countIntermediate);
 
-    public Game(int countIntermediate, int countRectangles) {
-        JComponent jComponent =new LightweightRect();
-        LightweightRect l=(LightweightRect) jComponent;
+    private JButton addRectangle=new JButton("Добавить прямоугольник");
+    private JButton removeRectangle=new JButton("Удалить прямоугольник");
+    private JLabel countRectangle=new JLabel("Прямоугольников: "+countRectangles);
+
+    private JLabel textSizeSquare=new JLabel("Изменить размер клеток");
+    private JTextField  sizeSquare=new JTextField("15",4);
+    private JButton saveSizeSquare=new JButton("Сохранить размер клекти");
+
+    private JLabel textRadiusRobot=new JLabel("Изменить радиус робота");
+    private JTextField  radiusRobot=new JTextField("15",4);
+    private JButton saveRadiusRobot=new JButton("Сохранить размер робота");
+
+    private JLabel testWay=new JLabel("Построение пути");
+    private JButton way=new JButton("Построить путь");
+    private Container container=this.getContentPane();
+    private JPanel help=new JPanel(new GridLayout(14,1));
+
+    public Game() {
+        super("Мобильный робот движется по плоскости");
+
+        JComponent jPanel =new LightweightRect();
+        jPanel.setBounds(0,0,900,900);
+        LightweightRect l=(LightweightRect) jPanel;
 
         initCircles(countIntermediate, l);
 
         initRectangle(countRectangles,l);
 
         System.out.println("Запуск игры...");
-        JFrame window = new JFrame("Мобильный робот движется по плоскости");
-        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        window.setSize(900, 900);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setSize(1200, 900);
 
-        window.setLocationRelativeTo(null);
-        window.setResizable(false);
+        setLocationRelativeTo(null);
+        setResizable(false);
 
-        window.add(jComponent);
-
-
-        jComponent.addMouseListener(new MouseAdapter() {
+        jPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
@@ -58,18 +84,207 @@ public class Game {
         });
 
 
-        jComponent.addMouseMotionListener(new MouseAdapter() {
+        jPanel.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
-                isCircleDragged(e, window, jComponent);
+                isCircleDragged(e, this, jPanel);
 
-                isRectangleDragged(e, window, jComponent);
+                isRectangleDragged(e, this, jPanel);
             }
         });
 
-        window.setVisible(true);
+        container.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        container.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+
+        constraints.anchor=GridBagConstraints.NORTHWEST;
+        constraints.gridx=GridBagConstraints.LINE_START;
+        constraints.ipadx=990;
+        constraints.ipady=990;
+        container.add(jPanel, constraints);
+
+
+        helpPanel(jPanel,l);
+        constraints.anchor=GridBagConstraints.NORTHEAST;
+        constraints.gridx=GridBagConstraints.LINE_END;
+        constraints.ipadx=180;
+        constraints.ipady=180;
+        container.add(help,constraints);
+
+        setVisible(true);
         System.out.println("Конец игры...");
+    }
+
+    private void helpPanel(JComponent jComponent,LightweightRect l) {
+        //работа с кругом
+        help.add(countCircle);
+        addCircle.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                countIntermediate++;
+                supplementCircle(l,jComponent);
+                countCircle.setText("Промежуточные точки: "+countIntermediate);
+            }
+        });
+
+        help.add(addCircle);
+        removeCircle.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                if(countIntermediate>=1) {
+                    countIntermediate--;
+                }
+
+                deleteCircle(l,jComponent);
+                countCircle.setText("Промежуточные точки: "+countIntermediate);
+            }
+        });
+        help.add(removeCircle);
+//-------------------------------------------------------------------------------------------------------------------------
+        //работа с прямоугольником
+        help.add(countRectangle);
+        addRectangle.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                countRectangles++;
+                setAddRectangle(l,jComponent);
+                countRectangle.setText("Прямоугольников: "+countRectangles);
+            }
+        });
+
+        help.add(addRectangle);
+        removeRectangle.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                countRectangles--;
+                countRectangle.setText("Прямоугольников: "+countRectangles);
+            }
+        });
+        help.add(removeRectangle);
+//-----------------------------------------------------------------------------------------------------------------------
+
+        //размер квадрата
+        help.add(textSizeSquare);
+        help.add(sizeSquare);
+        saveSizeSquare.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+
+                try {
+                    splittingX=Integer.parseInt(sizeSquare.getText());
+                    splittingY=Integer.parseInt(sizeSquare.getText());
+                    jComponent.repaint();
+                }catch (Exception exception){
+                    ErrorConsole error=new ErrorConsole();
+                    error.error("Не верное значение");
+                }
+            }
+        });
+        help.add(saveSizeSquare);
+//-----------------------------------------------------------------------------------------------------------------------
+
+        //размер робота
+        help.add(textRadiusRobot);
+        help.add(radiusRobot);
+        saveRadiusRobot.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+
+                try {
+                    radius=Integer.parseInt(radiusRobot.getText());
+                    jComponent.repaint();
+                }catch (Exception exception){
+                    ErrorConsole error=new ErrorConsole();
+                    error.error("Не верное значение");
+                }
+            }
+        });
+        help.add(saveRadiusRobot);
+//-----------------------------------------------------------------------------------------------------------------------
+
+        //построение пути
+        help.add(testWay);
+        way.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                if(e.getButton()==MouseEvent.BUTTON3){
+                    LightweightRect.travelTime =false;
+                }else{
+                    LightweightRect.travelTime =true;
+                }
+
+                try {
+                    jComponent.repaint();
+                }catch (Exception exception){
+                    LightweightRect.travelTime =false;
+                    ErrorConsole error=new ErrorConsole();
+                    error.error("Не возможно простить путь");
+                    jComponent.repaint();
+                }
+
+            }
+
+        });
+
+        help.add(way);
+    }
+
+    private void setAddRectangle(LightweightRect l,JComponent jComponent){
+        if(rectangles.size()%2==0) {
+            rectangles.add(new Graphs.Rectangle(x, y, height,width));
+        }else{
+            rectangles.add(new Graphs.Rectangle(x,y, width,height));
+        }
+    }
+
+    private void randRectangle(){
+
+    }
+
+    private void supplementCircle(LightweightRect l,JComponent jComponent){
+        randCircle();
+        circles.add(circles.size()-1,new Circle(x,y,radius,Circle.POINT_INTERMEDIATE));
+        l.circles=circles;
+        jComponent.repaint();
+    }
+
+    private void randCircle(){
+        for(int i=3;i< Graph.matrix.length;i++){
+            boolean isEnd=false;
+
+            for(int j=3;j<Graph.matrix[i].length;j++){
+                if(Graph.matrix[i][j]!=Integer.MAX_VALUE){
+                    int count=0;
+                    x=i*splittingX;
+                    y=j*splittingY;
+
+                    for(int k=0;k<circles.size();k++){
+                        Circle temp=circles.get(k);
+
+                        if(temp.point.getY()!=y &&temp.point.getX()!=x){
+                            count++;
+                        }
+                    }
+
+                    if(count==circles.size()){
+                        isEnd=true;
+                        break;
+                    }
+
+                }
+            }
+
+            if(isEnd)
+                break;
+        }
     }
 
     private void isRectanglePressed(MouseEvent e) {
@@ -84,7 +299,7 @@ public class Game {
         }
     }
 
-    private void isRectangleDragged(MouseEvent e, JFrame window, JComponent jComponent) {
+    private void isRectangleDragged(MouseEvent e, MouseAdapter window, JComponent jComponent) {
         for(int i=0;i<rectangles.size();i++) {
             Graphs.Rectangle rectangle=rectangles.get(i);
 
@@ -98,7 +313,7 @@ public class Game {
                 long pointAttractionY = Math.round(newRectangleY / splittingY);
                 newRectangleY = splittingY * pointAttractionY;
 
-                if (newRectangleX <= window.getWidth()-2*radius && newRectangleY <= window.getHeight()-2*radius && newRectangleX >= 0 && newRectangleY >= 0) {
+                if (newRectangleX < fieldSize-2*radius && newRectangleY < fieldSize-2*radius && newRectangleX >= 0 && newRectangleY >= 0) {
                     rectangle.point.setLocation(newRectangleX, newRectangleY);
                     jComponent.repaint();
                 }
@@ -106,7 +321,7 @@ public class Game {
         }
     }
 
-    private void isCircleDragged(MouseEvent e, JFrame window, JComponent jComponent) {
+    private void isCircleDragged(MouseEvent e, MouseAdapter window, JComponent jComponent) {
         for(int i=0;i<circles.size();i++) {
             Circle circle1=circles.get(i);
 
@@ -119,15 +334,8 @@ public class Game {
 
                 long pointAttractionY = Math.round(newCircleY / splittingY);
                 newCircleY = splittingY * pointAttractionY ;
-                System.out.println("newCircleX "+newCircleX);
-                System.out.println("newCircleY "+newCircleY);
 
-
-                System.out.println("w "+(window.getWidth() ));
-                System.out.println("h "+(window.getHeight() ));
-
-                if (newCircleX <= window.getWidth()-2*radius && newCircleY <= window.getHeight()-2*radius  && newCircleX >= 0 && newCircleY >= 0) {
-                    System.out.println("repaint");
+                if (newCircleX <=fieldSize-2*radius && newCircleY <= fieldSize-2*radius  && newCircleX >= 0 && newCircleY >= 0) {
                     circle1.point.setLocation(newCircleX, newCircleY);
                     jComponent.repaint();
                 }
@@ -152,15 +360,23 @@ public class Game {
 
         for (int i = 0; i< countRectangles; i++){
             if(i%2==0) {
-                rectangles.add(new Graphs.Rectangle(15, u, height,width));
+                rectangles.add(new Graphs.Rectangle(40, u, height,width));
                 u +=height;
             }else{
-                rectangles.add(new Graphs.Rectangle(15,o, width,height));
+                rectangles.add(new Graphs.Rectangle(40,o, width,height));
                 o+=width;
             }
         }
 
         l.rectangles=rectangles;
+    }
+
+    private void deleteCircle(LightweightRect l,JComponent jComponent){
+        if(circles.size()>2){
+            circles.remove(1);
+            l.circles=circles;
+            jComponent.repaint();
+        }
     }
 
     private void initCircles(int countIntermediate, LightweightRect l) {
@@ -183,8 +399,6 @@ public class Game {
 
         l.circles=circles;
     }
-
-
 }
 
 

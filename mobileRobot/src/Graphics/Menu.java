@@ -21,9 +21,8 @@ public class Menu {
         play.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                SettingGame settingGame = new SettingGame();
+                Game game = new Game();
                 windowPatch.setVisible(false);
-                settingGame.setVisible(true);
             }
         });
 

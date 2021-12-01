@@ -2,21 +2,26 @@ package Graphs;
 
 import javax.swing.*;
 import java.awt.*;
+
 import java.util.ArrayList;
 
-import static Graphics.Game.radius;
-import static Graphics.Game.splittingX;
-import static Graphics.Game.splittingY;
+import static Graphics.Game.*;
 
 public class LightweightRect extends JComponent {
     public ArrayList<Circle> circles = new ArrayList<>();
     public ArrayList<Rectangle> rectangles = new ArrayList<>();
-    private int drawCount=0;
+    private  ArrayList<Point> way=new ArrayList<>();
+
+    public static boolean travelTime=false;
+    private int drawCount = 0;
+
     @Override
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         drawCount++;
-        System.out.println("start_draw_"+drawCount);
+        System.out.println("start_draw_" + drawCount);
+
+        fillingPath();
 
         drawGrid(graphics);
 
@@ -26,37 +31,50 @@ public class LightweightRect extends JComponent {
 
         drawLine(graphics);
 
-        System.out.println("end_draw_"+drawCount);
+        System.out.println("end_draw_" + drawCount);
     }
 
-    private void drawLine(Graphics graphics) {
+
+
+    private void fillingPath(){
+        Graph.matrix = new int[fieldSize / splittingX + 2][fieldSize / splittingY + 2];
+
+        for (int i = 0; i <= (fieldSize - 2 * radius) / splittingX; i++) {
+            for (int j = 0; j <= (fieldSize - 2 * radius) / splittingY; j++) {
+                Graph.matrix[i][j] = splittingY;
+            }
+        }
+
+        for (int i = 0; i < rectangles.size(); i++) {
+            Rectangle rectangle = rectangles.get(i);
+            infiniteSpace(rectangle.point, rectangle.w, rectangle.h);
+        }
+
+    }
+
+    private void drawLine(Graphics graphics)  {
         graphics.setColor(Color.RED);
         for (int j = 0; j < circles.size() - 1; j++) {
-            ArrayList<Point> list = Graph.FindPath(new Point(
+            way = Graph.FindPath(new Point(
                             (int) circles.get(j).point.getX() / splittingX
                             , (int) circles.get(j).point.getY() / splittingY),
                     new Point((int) circles.get(j + 1).point.getX() / splittingX,
                             (int) circles.get(j + 1).point.getY() / splittingY));
 
-            System.out.println("j= "+j+" list= "+list);
-            double start_x=circles.get(j).point.getX();
-            double start_y=circles.get(j).point.getY();
 
-            System.out.println(j+"("+start_x+" "+start_y+")");
+            if(travelTime) {
+                    Graphics2D g = (Graphics2D) graphics;
+                    g.setStroke(new BasicStroke(3));
 
-            double end_x= circles.get(j + 1).point.getX() ;
-            double end_y= circles.get(j + 1).point.getY() ;
-            System.out.println((j+1)+"("+end_x+" "+end_y+")");
-
-            Graphics2D g = (Graphics2D) graphics;
-            g.setStroke(new BasicStroke(3));
-
-            for (int i = 0; i < list.size() - 1; i++) {
-                graphics.drawLine(list.get(i).X * splittingX + radius, list.get(i).Y * splittingY + radius
-                        , list.get(i + 1).X * splittingX + radius, list.get(i + 1).Y * splittingY + radius);
+                    for (int i = 0; i < way.size() - 1; i++) {
+                        graphics.drawLine(way.get(i).X * splittingX + radius, way.get(i).Y * splittingY + radius
+                                , way.get(i + 1).X * splittingX + radius, way.get(i + 1).Y * splittingY + radius);
+                    }
             }
         }
     }
+
+
 
     private void drawRectangle(Graphics graphics) {
         graphics.setColor(Color.ORANGE);
@@ -81,50 +99,46 @@ public class LightweightRect extends JComponent {
     }
 
     private void drawGrid(Graphics g) {
-        int w = getWidth();
-        int h = getHeight();
+        int w = fieldSize;
+        int h = fieldSize;
 
         int dw = splittingX;
         int dh = splittingY;
 
         g.setColor(Color.BLACK);
 
-        for (int i = 1; i <= getWidth() / splittingX; i++) {
+        for (int i = 1; i <= fieldSize / splittingX; i++) {
             int y1 = dh * i;
             int x1 = dw * i;
 
             int y2 = dh * i;
             int x2 = dw * i;
 
-            if (y2 <= getHeight() && y1 <= getHeight()) {
+            if (y2 <= fieldSize && y1 <= fieldSize) {
                 g.drawLine(0, y1, w, y2);
             }
 
-            if (x1 <= getWidth() && x2 <= getWidth())
+            if (x1 <= fieldSize && x2 <= fieldSize)
                 g.drawLine(x1, 0, x2, h);
         }
 
-
-        Graph.matrix = new int[getWidth() / splittingX + 1][getHeight() / splittingY + 1];
-
-        for (int i = 0; i < 870 / splittingX; i++) {
-            for (int j = 0; j < 870 / splittingY; j++) {
-                Graph.matrix[i][j] = splittingY;
-            }
-        }
-
-        for (int i = 0; i < rectangles.size(); i++) {
-            Rectangle rectangle = rectangles.get(i);
-            infiniteSpace(rectangle.point, rectangle.w, rectangle.h);
-        }
     }
 
     private void infiniteSpace(java.awt.Point p, int width, int height) {
-        for (int i = (int) p.getX() - splittingX; i < p.getX() + width; i += splittingX) {
-            for (int j = (int) p.getY() - splittingY; j < p.getY() + height; j += splittingY) {
-                Graph.matrix[i / splittingX][j / splittingY] = Integer.MAX_VALUE;
+        for (int i = (int) p.getX() - radius; i < p.getX() + width +radius; i += splittingX) {
+            for (int j = (int) p.getY() - radius; j < p.getY() + height + radius; j += splittingY) {
+                if (i >= 0 && j >= 0 && fieldSize > p.getX() + width + radius && fieldSize>p.getY() + height + radius)
+                    Graph.matrix[i / splittingX][j / splittingY] = Integer.MAX_VALUE;
             }
         }
     }
+
+    private void pointLocation() {
+        for (int i = 0; i < circles.size(); i++) {
+            Circle c = circles.get(i);
+            Graph.matrix[(int) (c.point.getX() / splittingX)][(int) (c.point.getY() / splittingY)] = Integer.MAX_VALUE;
+        }
+    }
+
 }
 
