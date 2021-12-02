@@ -5,6 +5,17 @@ import java.awt.event.MouseEvent;
 
 public class Circle {
     public Point point=new Point();
+
+    @Override
+    public String toString() {
+        return "Circle{" +
+                "point=" + point +
+                ", radius=" + radius +
+                ", moving=" + moving +
+                ", type=" + type +
+                '}';
+    }
+
     public int radius;
     public boolean moving;
     private int type;//0 ноль  это старт 1 конец 2 промежуточный

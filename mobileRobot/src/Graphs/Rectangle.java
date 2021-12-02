@@ -15,10 +15,21 @@ public class Rectangle {
     public int w;
     public boolean moving;
 
+    @Override
+    public String toString() {
+        return "Rectangle{" +
+                "point=" + point +
+                ", h=" + h +
+                ", w=" + w +
+                ", moving=" + moving +
+                '}';
+    }
+
     public boolean mouseInside(MouseEvent e){
         moving=isEmpty(point,e.getPoint(),w,h);
         return moving;
     }
+
 
     private boolean isEmpty(Point point, Point mouse, int width, int height) {
         return point.getX() <= mouse.getX() && point.getY() <= mouse.getY() &&

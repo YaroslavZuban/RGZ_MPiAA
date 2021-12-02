@@ -9,7 +9,7 @@ public class ErrorConsole {
     private JDialog createDialog(String title, boolean modal) {
         JDialog dialog = new JDialog();
         dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        dialog.setSize(180, 90);
+        dialog.setSize(200, 90);
         return dialog;
     }
 
@@ -17,7 +17,7 @@ public class ErrorConsole {
         JDialog dialog = createDialog(line, true);
         dialog.setLocationRelativeTo(null);
 
-        JLabel l = new JLabel("     Не верное значение");
+        JLabel l = new JLabel(line);
         JButton b = new JButton("ок");
 
         dialog.add(l, BorderLayout.NORTH);
