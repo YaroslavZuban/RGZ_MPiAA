@@ -3,6 +3,7 @@ package Graphics;
 import Graphs.Circle;
 import Graphs.Graph;
 import Graphs.LightweightRect;
+import Graphs.WorkingFile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,11 +13,11 @@ import java.util.ArrayList;
 
 
 public class Game extends JFrame {
-    private ArrayList<Circle> circles = new ArrayList<>();
-    private ArrayList<Graphs.Rectangle> rectangles = new ArrayList<>();
+    private final ArrayList<Circle> circles = new ArrayList<>();
+    private final ArrayList<Graphs.Rectangle> rectangles = new ArrayList<>();
 
-    private Point pressMousePoint = new Point();
-    private Point oldDraggedPositionPoint = new Point();
+    private final Point pressMousePoint = new Point();
+    private final Point oldDraggedPositionPoint = new Point();
 
     public static int splittingX = 15;
     public static int splittingY = 15;
@@ -32,26 +33,32 @@ public class Game extends JFrame {
     private int y;
     public static boolean isNoWay = false;
 
-    private JButton addCircle = new JButton("Добавить точку");
-    private JButton removeCircle = new JButton("Удалить точку");
-    private JLabel countCircle = new JLabel("Промежуточные точки: " + countIntermediate);
+    private final JButton addCircle = new JButton("Добавить точку");
+    private final JButton removeCircle = new JButton("Удалить точку");
+    private final JLabel countCircle = new JLabel("Промежуточные точки: " + countIntermediate);
 
-    private JButton addRectangle = new JButton("Добавить прямоугольник");
-    private JButton removeRectangle = new JButton("Удалить прямоугольник");
-    private JLabel countRectangle = new JLabel("Прямоугольников: " + countRectangles);
+    private final JButton addRectangle = new JButton("Добавить прямоугольник");
+    private final JButton removeRectangle = new JButton("Удалить прямоугольник");
+    private final JLabel countRectangle = new JLabel("Прямоугольников: " + countRectangles);
 
-    private JLabel textSizeSquare = new JLabel("Изменить размер клеток");
-    private JTextField sizeSquare = new JTextField("15", 4);
-    private JButton saveSizeSquare = new JButton("Сохранить размер клекти");
+    private final JLabel textSizeSquare = new JLabel("Изменить размер клеток");
+    private final JTextField sizeSquare = new JTextField("15", 4);
+    private final JButton saveSizeSquare = new JButton("Сохранить размер клекти");
 
-    private JLabel textRadiusRobot = new JLabel("Изменить радиус робота");
-    private JTextField radiusRobot = new JTextField("15", 4);
-    private JButton saveRadiusRobot = new JButton("Сохранить размер робота");
+    private final JLabel textRadiusRobot = new JLabel("Изменить радиус робота");
+    private final JTextField radiusRobot = new JTextField("15", 4);
+    private final JButton saveRadiusRobot = new JButton("Сохранить размер робота");
 
-    private JLabel testWay = new JLabel("Построение пути");
-    private JButton way = new JButton("Построить путь");
-    private Container container = this.getContentPane();
-    private JPanel help = new JPanel(new GridLayout(14, 1));
+    private final JLabel testSaveFile = new JLabel("Сохранения в файл");
+    private final JButton saveFile = new JButton("Сохранения в файл");
+
+    private final JLabel textReadingFile = new JLabel("Загрузить из файла");
+    private final JButton readingFile = new JButton("Загрузить из файла");
+
+    private final JLabel testWay = new JLabel("Построение пути");
+    private final JButton way = new JButton("Построить путь");
+    private final Container container = this.getContentPane();
+    private final JPanel help = new JPanel(new GridLayout(20, 1));
 
     public Game() {
         super("Мобильный робот движется по плоскости");
@@ -109,8 +116,8 @@ public class Game extends JFrame {
         helpPanel(jPanel, l);
         constraints.anchor = GridBagConstraints.NORTHEAST;
         constraints.gridx = GridBagConstraints.LINE_END;
-        constraints.ipadx = 180;
-        constraints.ipady = 180;
+        constraints.ipadx = 100;
+        constraints.ipady = 80;
         container.add(help, constraints);
 
         setVisible(true);
@@ -225,7 +232,9 @@ public class Game extends JFrame {
                 } else {
                     LightweightRect.travelTime = true;
                     jComponent.repaint();
+
                     if (isNoWay) {
+                        isNoWay = false;
                         LightweightRect.travelTime = false;
                         ErrorConsole error = new ErrorConsole();
                         error.error("Не возможно построить путь");
@@ -240,6 +249,46 @@ public class Game extends JFrame {
         });
 
         help.add(way);
+
+        //-----------------------------------------------------------------------------------------------------------------------
+        help.add(testSaveFile);
+
+        saveFile.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                WorkingFile workingFile = new WorkingFile();
+                workingFile.save();
+            }
+        });
+        help.add(saveFile);
+        //-----------------------------------------------------------------------------------------------------------------------
+
+        help.add(textReadingFile);
+
+        readingFile.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+
+                for (int i = 1; i < circles.size() - 1; i++) {
+                    circles.remove(i);
+                }
+
+                rectangles.clear();
+
+                WorkingFile workingFile = new WorkingFile();
+                workingFile.reading();
+
+                setAddRectangle(l, jComponent);
+                supplementCircle(l, jComponent);
+
+                countCircle.setText("Промежуточные точки: " + countIntermediate);
+                countRectangle.setText("Прямоугольников: " + countRectangles);
+            }
+        });
+
+        help.add(readingFile);
     }
 
     private void deleteRectangles(LightweightRect l, JComponent jComponent) {
@@ -355,7 +404,7 @@ public class Game extends JFrame {
                 long pointAttractionY = Math.round(newRectangleY / splittingY);
                 newRectangleY = splittingY * pointAttractionY;
 
-                if (newRectangleX+rectangle.w < fieldSize+splittingY && newRectangleY+rectangle.h < fieldSize+splittingY  && newRectangleX >= 0 && newRectangleY >= 0) {
+                if (newRectangleX + rectangle.w < fieldSize + splittingY && newRectangleY + rectangle.h < fieldSize-2*splittingY && newRectangleX >= 0 && newRectangleY >= 0) {
                     rectangle.point.setLocation(newRectangleX, newRectangleY);
                     jComponent.repaint();
                 }
@@ -377,7 +426,7 @@ public class Game extends JFrame {
                 long pointAttractionY = Math.round(newCircleY / splittingY);
                 newCircleY = splittingY * pointAttractionY;
 
-                if (newCircleX <= fieldSize - 2 * radius && newCircleY <= fieldSize - 2 * radius && newCircleX >= 0 && newCircleY >= 0 &&isExistingPoint(newCircleX,newCircleY)) {
+                if (newCircleX <= fieldSize - 2 * radius && newCircleY <= fieldSize - 5 * radius && newCircleX >= 0 && newCircleY >= 0 && isExistingPoint(newCircleX, newCircleY)) {
                     circle1.point.setLocation(newCircleX, newCircleY);
                     jComponent.repaint();
                 }
@@ -447,7 +496,7 @@ public class Game extends JFrame {
         for (int i = 0; i < circles.size(); i++) {
             Circle temp = circles.get(i);
 
-            if (temp.point.getX() == x && temp.point.getY() == y){
+            if (temp.point.getX() == x && temp.point.getY() == y) {
                 return false;
             }
         }

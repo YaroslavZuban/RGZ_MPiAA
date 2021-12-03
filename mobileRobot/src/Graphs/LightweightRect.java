@@ -13,7 +13,6 @@ public class LightweightRect extends JComponent {
     private ArrayList<Point> way = new ArrayList<>();
 
     public static boolean travelTime = false;
-    private int drawCount = 0;
 
     @Override
     public void paintComponent(Graphics graphics) {
@@ -70,18 +69,14 @@ public class LightweightRect extends JComponent {
 
                     if (Graph.matrix[temp.getX() / splittingX][temp.getY() / splittingY] == Integer.MAX_VALUE) {
                         travelTime = false;
-                        isNoWay = true;
                         isLine = false;
+                        break;
                     }
                 }
 
-                System.out.println(way);
                 if (travelTime && isLine) {
-                    isNoWay = false;
                     Graphics2D g = (Graphics2D) graphics;
                     g.setStroke(new BasicStroke(3));
-
-                    System.out.println(way);
 
                     for (int i = 0; i < way.size() - 1; i++) {
                         graphics.drawLine(way.get(i).X * splittingX + radius, way.get(i).Y * splittingY + radius
@@ -115,8 +110,6 @@ public class LightweightRect extends JComponent {
 
             graphics.fillOval(circle1.point.x, circle1.point.y, radius * 2, radius * 2);
         }
-
-       // System.out.println(circles);
     }
 
     private void drawGrid(Graphics g) {
