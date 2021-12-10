@@ -46,6 +46,8 @@ public class Graph {
 
     private static ArrayList<PathNode> GetNeighbours(PathNode pathNode, Point goal)//возвращает список "годных" соседей
     {
+        int i=0;
+        int x=1;
         ArrayList<PathNode> result = new ArrayList<>();
         Point[] neighbourPoints = new Point[8];
         neighbourPoints[0] = new Point(pathNode.position.X + 1, pathNode.position.Y);
@@ -65,6 +67,7 @@ public class Graph {
                 continue;
             if (matrix[point.X][point.Y] == Integer.MAX_VALUE)
                 continue;
+
             PathNode neighbourNode = new PathNode(point, pathNode, goal);
             result.add(neighbourNode);
         }

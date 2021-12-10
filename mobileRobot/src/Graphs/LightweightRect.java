@@ -32,10 +32,10 @@ public class LightweightRect extends JComponent {
 
 
     private void fillingPath() {
-        Graph.matrix = new int[fieldSize / splittingX][fieldSize / splittingY ];
+        Graph.matrix = new int[fieldSize / splittingX][855 / splittingY ];
 
         for (int i = 0; i < fieldSize / splittingX; i++) {
-            for (int j = 0; j <fieldSize  / splittingY; j++) {
+            for (int j = 0; j <855  / splittingY; j++) {
                 Graph.matrix[i][j] = splittingY;
             }
         }
@@ -59,6 +59,7 @@ public class LightweightRect extends JComponent {
                             (int) circles.get(j + 1).point.getY() / splittingY));
 
 
+            System.out.println(way);
             if (way == null) {
                 isNoWay = true;
                 break;
@@ -145,13 +146,6 @@ public class LightweightRect extends JComponent {
                     Graph.matrix[i / splittingX][j / splittingY] = Integer.MAX_VALUE;
                 }
             }
-        }
-    }
-
-    private void pointLocation() {
-        for (int i = 0; i < circles.size(); i++) {
-            Circle c = circles.get(i);
-            Graph.matrix[(int) (c.point.getX() / splittingX)][(int) (c.point.getY() / splittingY)] = Integer.MAX_VALUE;
         }
     }
 

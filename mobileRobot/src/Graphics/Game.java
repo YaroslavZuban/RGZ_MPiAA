@@ -96,9 +96,10 @@ public class Game extends JFrame {
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
-                isCircleDragged(e, this, jPanel);
 
-                isRectangleDragged(e, this, jPanel);
+                isCircleDragged(e, this, jPanel,splittingX,splittingY,radius);
+
+                isRectangleDragged(e, this, jPanel,splittingX,splittingY);
             }
         });
 
@@ -258,7 +259,9 @@ public class Game extends JFrame {
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
                 WorkingFile workingFile = new WorkingFile();
-                workingFile.save();
+                workingFile.saveCircle(circles);
+                workingFile.saveRectangle(rectangles);
+                workingFile.saveSizeSquare(splittingX);
             }
         });
         help.add(saveFile);
@@ -271,20 +274,19 @@ public class Game extends JFrame {
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
 
-                for (int i = 1; i < circles.size() - 1; i++) {
-                    circles.remove(i);
-                }
-
-                rectangles.clear();
-
                 WorkingFile workingFile = new WorkingFile();
-                workingFile.reading();
+                workingFile.readingCircle(circles);
+                workingFile.readingRectangle(rectangles);
+                workingFile.readingSizeSquare();
 
-                setAddRectangle(l, jComponent);
-                supplementCircle(l, jComponent);
+                radius=circles.get(0).radius;
+                l.circles=circles;
+
+                l.rectangles=rectangles;
 
                 countCircle.setText("Промежуточные точки: " + countIntermediate);
                 countRectangle.setText("Прямоугольников: " + countRectangles);
+                jComponent.repaint();
             }
         });
 
@@ -390,7 +392,7 @@ public class Game extends JFrame {
         }
     }
 
-    private void isRectangleDragged(MouseEvent e, MouseAdapter window, JComponent jComponent) {
+    private void isRectangleDragged(MouseEvent e, MouseAdapter window, JComponent jComponent,int splittingX,int splittingY) {
         for (int i = 0; i < rectangles.size(); i++) {
             Graphs.Rectangle rectangle = rectangles.get(i);
 
@@ -404,7 +406,7 @@ public class Game extends JFrame {
                 long pointAttractionY = Math.round(newRectangleY / splittingY);
                 newRectangleY = splittingY * pointAttractionY;
 
-                if (newRectangleX + rectangle.w < fieldSize + splittingY && newRectangleY + rectangle.h < fieldSize-2*splittingY && newRectangleX >= 0 && newRectangleY >= 0) {
+                if (newRectangleX + rectangle.w < fieldSize + radius && newRectangleY + rectangle.h < fieldSize-2*radius && newRectangleX >= 0 && newRectangleY >= 0) {
                     rectangle.point.setLocation(newRectangleX, newRectangleY);
                     jComponent.repaint();
                 }
@@ -412,8 +414,9 @@ public class Game extends JFrame {
         }
     }
 
-    private void isCircleDragged(MouseEvent e, MouseAdapter window, JComponent jComponent) {
+    private void isCircleDragged(MouseEvent e, MouseAdapter window, JComponent jComponent,int splittingX,int splittingY,int radius) {
         for (int i = 0; i < circles.size(); i++) {
+            circles.get(i).radius=radius;
             Circle circle1 = circles.get(i);
 
             if (circle1.moving) {
@@ -426,7 +429,7 @@ public class Game extends JFrame {
                 long pointAttractionY = Math.round(newCircleY / splittingY);
                 newCircleY = splittingY * pointAttractionY;
 
-                if (newCircleX <= fieldSize - 2 * radius && newCircleY <= fieldSize - 5 * radius && newCircleX >= 0 && newCircleY >= 0 && isExistingPoint(newCircleX, newCircleY)) {
+                if (newCircleX <= fieldSize -  splittingX-radius && newCircleY <= fieldSize - 4* splittingY-radius && newCircleX >= 0 && newCircleY >= 0 && isExistingPoint(newCircleX, newCircleY)) {
                     circle1.point.setLocation(newCircleX, newCircleY);
                     jComponent.repaint();
                 }
@@ -448,14 +451,24 @@ public class Game extends JFrame {
     private void initRectangle(int countRectangles, LightweightRect l) {
         int u = 60;
         int o = 300;
+        int x1=40;
+        int x2=40;
 
         for (int i = 0; i < countRectangles; i++) {
+            if(u>800||o>800){
+                x1+=width+20;
+                u=60;
+                x2+=height+20;
+                o=300;
+            }
+
             if (i % 2 == 0) {
-                rectangles.add(new Graphs.Rectangle(40, u, height, width));
+                rectangles.add(new Graphs.Rectangle(x1, u, height, width));
                 u += height;
             } else {
-                rectangles.add(new Graphs.Rectangle(40, o, width, height));
-                o += width;
+                rectangles.add(new Graphs.Rectangle(x2, o, width, height));
+                o += width+20;
+
             }
         }
 

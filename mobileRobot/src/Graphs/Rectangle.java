@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 public class Rectangle {
+
     public Rectangle(int x,int y, int h, int w) {
         this.point.setLocation(x,y);
         this.h = h;
