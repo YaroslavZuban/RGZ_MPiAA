@@ -3,6 +3,9 @@
     <output-path>$PROJECT_DIR$/out/artifacts/RGZ_MPiAA_jar2</output-path>
     <root id="archive" name="RGZ_MPiAA.jar">
       <element id="module-output" name="RGZ_MPiAA" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
     </root>
   </artifact>
 </component>
